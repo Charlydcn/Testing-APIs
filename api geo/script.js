@@ -1,9 +1,9 @@
 // on selectionne le form par un sélecteur CSS
 const form = document.querySelector('form')
 // et l'input text du code postal par sa classe
-const inputCodePostal = document.querySelector(".codepostal")
+const inputCP = document.querySelector(".codepostal")
 
-const inputText = document.createElement("p")
+const inputVille = document.querySelector(".ville")
 
 const result = document.querySelector(".result");
 
@@ -11,30 +11,31 @@ const result = document.querySelector(".result");
 // 3 DIFFERENTES MANIÈRES : 
 //      submit : lorsque l'utilisateur submit le form (eventListener sur le form)
 //      focusout : lorsque l'utilisateur clique en dehors du form (eventListener sur le form ou l'input au choix)
-//      input : lorsque l'utilisateur écris dans l'input inputCodePostal (eventListener sur le form ou l'input mais l'input me semble)
+//      input : lorsque l'utilisateur écris dans l'input inputCP (eventListener sur le form ou l'input mais l'input me semble)
 
 // form.addEventListener("focusout", (event) => {
     // form.addEventListener("submit", (event) => {
-inputCodePostal.addEventListener("input", () => {
+inputCP.addEventListener("input", () => {
     // on preventDefault() la fonction de base du submit (recharge la page, etc)
     // event.preventDefault();
 
     // à chaque event (input/focusout/submit selon la méthode), on appelle getInfosAPI en passant en paramètre le 
     // contenu de notre input si l'input est de 5 (code postal Français) alors go
-    if(inputCodePostal.value.length == 5) {
-        getInfosAPI(inputCodePostal);
+    if(inputCP.value.length == 5) {
+        getInfosByCP(inputCP);
     } else {
         result.innerHTML = ""
     }
-
-    inputText.innerText = inputCodePostal
-    
 })
 
-function getInfosAPI(inputCodePostal) {
+inputVille.addEventListener("input", () => {
+    getInfosByVille(inputVille);
+})
+
+function getInfosByCP(inputCP) {
 
     // Pour récupérer la valeur de l'input du form, input.value (après l'avoir sélectionner au préalable)
-    fetch("https://geo.api.gouv.fr/communes?codePostal=" + inputCodePostal.value + "&fields=nom,code,codesPostaux,population")
+    fetch("https://geo.api.gouv.fr/communes?codePostal=" + inputCP.value + "&fields=nom,code,codesPostaux,population")
     .then((response) => response.json())
     .then((data) => {
         console.log(data);
@@ -91,3 +92,57 @@ function getInfosAPI(inputCodePostal) {
     })
     .catch((error) => console.log(error));
 }
+
+function getInfosByVille(inputVille) {
+
+    // Pour récupérer la valeur de l'input du form, input.value (après l'avoir sélectionner au préalable)
+    fetch("https://geo.api.gouv.fr/communes?nom=" + inputVille.value + "&fields=nom,code,departement,region,population,codesPostaux&boost=population")
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data);
+
+        const result = document.querySelector(".result")
+
+        result.innerHTML = ""
+
+
+        const nom = document.createElement("p");
+        nom.innerHTML = "Ville : " + data[0].nom
+        result.appendChild(nom);
+
+
+        const departement = document.createElement("p");
+        departement.innerHTML = "Département : " + data[0].departement.nom + " (" + data[0].departement.code + " )"
+        result.appendChild(departement);
+
+        const region = document.createElement("p");
+        region.innerHTML = "Département : " + data[0].region.nom + " (" + data[0].region.code + " )"
+        result.appendChild(region);
+
+
+        const code = document.createElement("p");
+        code.innerHTML = "Code INSEE : " + data[0].code;
+        result.appendChild(code);
+
+
+        const titreSelect = document.createElement("p")
+        titreSelect.innerHTML = "Codes postaux associé : "
+        result.appendChild(titreSelect)
+
+        const codesPostaux = document.createElement("ul");
+        data[0].codesPostaux.forEach((codePostal) => {
+            const codePostalOption = document.createElement("li");
+
+            codePostalOption.textContent = codePostal
+            codesPostaux.appendChild(codePostalOption);
+        });
+        result.appendChild(codesPostaux);
+
+
+        const population = document.createElement("p");
+        population.innerHTML = "Population : " + data[0].population + " habitants";
+        result.appendChild(population);
+    })
+    .catch((error) => console.log(error));
+}
+
