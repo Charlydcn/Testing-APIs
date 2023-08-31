@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Geo</title>  
+</head>
+<body>
+    <main>
+        <h1>API Geo</h1>
+        <h2>Rechercher une ville par : </h2>
+
+        <form class="formAPI">
+            <label>Code postal
+                <input class="codepostal" type="text" name="codepostal" maxlength="5">
+            </label>
+
+            <br>
+
+            <label>Ville
+                <input class="ville" type="text" name="ville" id="ville" maxlength="20">
+            </label>
+
+            <br>
+            
+            <input type="submit" value="Valider">
+        </form>
+
+        <div class="result"></div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
